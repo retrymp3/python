@@ -1,1 +1,1 @@
- Python tasks from the bi0s pentest team 
+ Python tasks for the bi0s pentest team 
