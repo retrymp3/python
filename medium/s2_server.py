@@ -10,7 +10,7 @@ import socket
 key = b'strawhatpirateee' # Byte format key
 iv = b'piratekingstraww' # Byte format initialization vector
 
-def pad(s): # For adding extra spacess so the message becomes a multiple of 16 in bytes.
+def pad(s): # For adding extra spaces so the message is supplied as 16-byte blocks
     block_size = 16
     remainder = len(s) % block_size
     padding_needed = block_size - remainder
