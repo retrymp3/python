@@ -34,19 +34,18 @@ def encrypt(msg, key):
 	return (aes_text,salt,iv)
 
 # AF_INET specifies the ipv4 address family.
-# SOCK_STREAM specifies the TCP socket
-
+# SOCK_STREAM specifies the TCP socket.
 node = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 port_and_ip = ('127.0.0.1', int(input("Port: ")))
 node.bind(port_and_ip)   # Assigns an ip and port number to the socket instance.
 node.listen(1) # Limits the number of connections
-cnn, addr = node.accept() 
+cnn, addr = node.accept() # Listens for an incomming connection and upon connection it returns a (host,port) tuple.
 
 print ("Connection from: " + str(addr) )
 
 msg = input("Message: ")
 aes_text,salt,iv = encrypt(msg,key)
-msg_encode = msg.encode() # Hashing requires unicode-objects to be encoded. Utf-8 is used for character encoding.
+msg_encode = msg.encode() # Hashing requires unicode-objects to be encoded.
 hsh_hmac = hmac.new(key.encode(),msg_encode,hashlib.sha512)
 
 cnn.send(iv)
@@ -55,7 +54,7 @@ cnn.send(salt)
 time.sleep(1)
 cnn.send(aes_text)
 time.sleep(1)
-cnn.send(hsh_hmac.hexdigest().encode())
+cnn.send(hsh_hmac.hexdigest().encode()) # hexdigest() Returns the encoded data in hexadecimal format.
 time.sleep(1)
 
 node.close()
