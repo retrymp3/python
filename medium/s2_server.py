@@ -32,7 +32,7 @@ encrypted = AES.encrypt(pad) # Encrypting the padded message.
 msg_unicode = msg.encode('utf-8')
 hsh_hmac = hmac.new(key,msg_unicode,hashlib.sha512)
 cnn.send(encrypted)
-#time.sleep(2)
+time.sleep(1)
 cnn.send(hsh_hmac.hexdigest().encode('utf-8'))
 
 node.close()
