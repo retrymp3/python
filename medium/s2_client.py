@@ -24,8 +24,8 @@ def decrypt(salt,aes_text,iv,key):
 	
 def hash_hmac(hsh_hmac,msg_byte_decode):
 	hsh_hmac_decode = hsh_hmac.decode()
-	unpaded_msg_unicode = msg_byte_decode.encode()
-	return (hsh_hmac_decode,unpaded_msg_unicode)
+	msg_byte_encode = msg_byte_decode.encode()
+	return (hsh_hmac_decode,msg_byte_encode)
     
 node = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 port_and_ip = ('127.0.0.1', int(input("Port: ")))
@@ -33,16 +33,14 @@ node.connect(port_and_ip)
 
 iv = node.recv(1024)
 salt = node.recv(1024)
-
 aes_text = node.recv(1024)
 hsh_hmac =  node.recv(1024)
 
 decrypted = decrypt(salt,aes_text,iv,key)
-
 msg_byte_decode = decrypted.decode()
-hsh_hmac_decode,unpaded_msg_unicode = hash_hmac(hsh_hmac,msg_byte_decode)
 
-new_hsh_hmac = hmac.new(key.encode(),unpaded_msg_unicode,hashlib.sha512)
+hsh_hmac_decode,msg_byte_encode = hash_hmac(hsh_hmac,msg_byte_decode)
+new_hsh_hmac = hmac.new(key.encode(),msg_byte_encode,hashlib.sha512)
 new_hsh_hmac_hex = new_hsh_hmac.hexdigest()
 
 while aes_text:
