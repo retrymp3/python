@@ -7,34 +7,49 @@ import Crypto
 import socket
 
 
-key = b'strawhatpirateee'
-iv = b'piratekingstraww'
+key = "strawhatpirateee"
 
-def unpad(s): # remove the extra spaces at the end
-    return s.rstrip()
- 
+# remove the extra spaces at the end
+def unpad(s):
+	return s.rstrip()
+
+# Needs the same salt and iv as the encryption function.
+# Needs the same configurations for scypt and aes functions as in the encryption function.
+def decrypt(salt,aes_text,iv,key):
+	private_key = hashlib.scrypt(key.encode(), salt=salt, n=2**14, r=8, p=1, dklen=32)
+	aes = AES.new(private_key, AES.MODE_CBC, iv)
+	decrypted_msg = aes.decrypt(aes_text)
+	unpaded_msg = unpad(decrypted_msg)
+	return unpaded_msg
+	
+def hash_hmac(hsh_hmac,msg_byte_decode):
+	hsh_hmac_decode = hsh_hmac.decode()
+	unpaded_msg_unicode = msg_byte_decode.encode()
+	return (hsh_hmac_decode,unpaded_msg_unicode)
     
 node = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-port_and_ip = ('127.0.0.1', 4444) 
+port_and_ip = ('127.0.0.1', int(input("Port: ")))
 node.connect(port_and_ip)
 
-AES = AES.new(key, AES.MODE_CBC, iv)
+iv = node.recv(1024)
+salt = node.recv(1024)
 
-enc_msg = node.recv(1024)
+aes_text = node.recv(1024)
 hsh_hmac =  node.recv(1024)
-# enc_msg_decode = enc_msg.decode()
-hsh_hmac_decode = hsh_hmac.decode()
-decrypt_msg = AES.decrypt(enc_msg)
-unpaded_msg = unpad(decrypt_msg)
-msg_byte_decode = unpaded_msg.decode('utf-8')
-unpaded_msg_unicode = msg_byte_decode.encode('utf-8')
 
-new_hsh_hmac = hmac.new(key,unpaded_msg_unicode,hashlib.sha512)
+decrypted = decrypt(salt,aes_text,iv,key)
+
+msg_byte_decode = decrypted.decode()
+hsh_hmac_decode,unpaded_msg_unicode = hash_hmac(hsh_hmac,msg_byte_decode)
+
+new_hsh_hmac = hmac.new(key.encode(),unpaded_msg_unicode,hashlib.sha512)
 new_hsh_hmac_hex = new_hsh_hmac.hexdigest()
-while enc_msg:
+
+while aes_text:
 	if  (hsh_hmac_decode == new_hsh_hmac_hex):
 		print('Server: ' + msg_byte_decode) 
-		enc_msg = node.recv(1024) 
-	 
+		aes_text = node.recv(1024)
+	else:
+		print("The message has been tampered with, please exit the session")
+		break
 node.close() 
-
