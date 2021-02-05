@@ -37,10 +37,10 @@ aes_text = node.recv(1024)
 hsh_hmac =  node.recv(1024)
 
 decrypted = decrypt(salt,aes_text,iv,key)
-msg_byte_decode = decrypted.decode()
+msg_byte_decode = decrypted.decode() # The unpadded message will be in bytes, so converting it to str.
 
 hsh_hmac_decode,msg_byte_encode = hash_hmac(hsh_hmac,msg_byte_decode)
-new_hsh_hmac = hmac.new(key.encode(),msg_byte_encode,hashlib.sha512)
+new_hsh_hmac = hmac.new(key.encode(),msg_byte_encode,hashlib.sha512) # Hashing requires everything to be in bytes,so encoding the key.
 new_hsh_hmac_hex = new_hsh_hmac.hexdigest()
 
 while aes_text:
