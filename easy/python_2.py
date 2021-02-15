@@ -22,7 +22,7 @@ explored.append(x)
 while srh:
 	p = srh.pop(0)
 #	change the path of the directory before using it in your own system
-	cmd = "ls $HOME/Desktop/bi0s/pentest_team/tasks/python/easy/python_2/"+p
+	cmd = "ls $HOME/python_2/"+p
 	os.system(cmd)
 #	print(p)
 	for i in directory_tree[p]:
